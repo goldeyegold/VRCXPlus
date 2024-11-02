@@ -1,58 +1,213 @@
+﻿#region Resharper
+// ReSharper disable IdentifierTypo
+// ReSharper disable CommentTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable CheckNamespace
+#endregion
+
+#region Unlicense
+/* This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to https://unlicense.org */
+#endregion
+
+#region References
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
-// ReSharper disable IdentifierTypo
-// ReSharper disable StringLiteralTypo
+#endregion
 
-Console.WriteLine("Patch made by Polar.");
-
-#pragma warning disable CA1416
-if (!new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator))
-#pragma warning restore CA1416
+namespace VRCXPlus
 {
-    Console.WriteLine("Please run as Administrator!");
-    Console.WriteLine();
-    Console.ReadKey();
-    return;
+    internal static class Patch
+    {
+        private static readonly Dictionary<string, string[]> LanguagePatches = new()
+        {
+            {
+                "en, fr, ko, vi, zh-tw", new[]
+                {
+                    @"Local Favorites \(Requires VRC\+\)",
+                    "Local Favorites"
+                }
+            },
+            {
+                "es", new[]
+                {
+                    @"Favoritos locales \(Requiere VRC\+\)",
+                    "Favoritos locales"
+                }
+            },
+            {
+                "ja", new[]
+                {
+                    @"ローカルのお気に入り \(VRC\+が必要\)",
+                    "ローカルのお気に入り"
+                }
+            },
+            {
+                "pl", new[]
+                {
+                    @"Lokalne ulubione \(wymaga VRC\+\)",
+                    "Lokalne ulubione"
+                }
+            },
+            {
+                "pt", new[]
+                {
+                    @"Favoritos Locais \(Requer VRC\+\)",
+                    "Favoritos Locais"
+                }
+            },
+            {
+                "ru", new[]
+                {
+                    @"Локальное избранное \(требуется VRC\+\)",
+                    "Локальное избранное"
+                }
+            },
+            {
+                "zh-cn p1", new[]
+                {
+                    @"模型收藏 \(需要VRC\+，游戏中不可见\)",
+                    "模型收藏"
+                }
+            },
+            {
+                "zh-cn p2", new[]
+                {
+                    @"本地收藏\（需要VRC\+，游戏内不可见\）",
+                    "本地收藏"
+                }
+            }
+        };
+        
+        public static void Main()
+        {
+            Console.Title = "VRCX+";
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                WaitForMsg("This patch was only intended for Windows!");
+                return;
+            }
+
+            if (!new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator))
+            {
+                WaitForMsg("This patch requires administrator access to ensure it works!");
+                return;
+            }
+
+            var vrcx = Process.GetProcessesByName("VRCX");
+            var basePath = "NOT FOUND";
+            var dir = "NOT FOUND";
+
+            if (vrcx.Length == 0)
+            {
+                if (!WaitForChoice("Could not find VRCX, continue install? (y/n)"))
+                {
+                    WaitForMsg("Ensure VRCX is running to auto detect it!");
+                    return;
+                }
+            }
+            else
+            {
+                basePath = Path.GetDirectoryName(vrcx[0].MainModule?.FileName);
+                dir = $@"{basePath}\html\app.js";
+            }
+            
+            while (!File.Exists(dir))
+            {
+                Console.WriteLine("Could not locate app.js, are we editing VRCX?");
+                Console.WriteLine($"[BASE PATH] {basePath}");
+
+                if (!WaitForChoice("Override this path and continue install? (y/n)"))
+                {
+                    WaitForMsg("Ensure no other running apps are named VRCX when running this patch!");
+                    return;
+                }
+
+                Console.WriteLine("Input override base path!");
+                dir = $@"{Console.ReadLine()}\html\app.js";
+            }
+
+            if (vrcx.Length > 0)
+                vrcx[0].Kill();
+            
+            var code = File.ReadAllText(dir);
+            
+            Console.WriteLine("Attempting to patch function!");
+            
+            var obfuscated = Regex.Matches(code, @"([a-zA-Z])\.methods\.");
+            if (RegexPatch(ref code,
+                    @"[a-zA-Z]\.methods\.isLocalUserVrcplusSupporter=function\(\){return [a-zA-Z]\.currentUser\.\$isVRCPlus}",
+                    $"{obfuscated[0].Value}isLocalUserVrcplusSupporter=function(){{return true}}"))
+                Console.WriteLine("Patched function, Local Favorites are always on!");
+            else
+            {
+                WaitForMsg("Could not find original function VRCX has changed substantially or the patch was already applied! Please create an Issue if it is the former.");
+                return;
+            }
+
+            Console.WriteLine("Attempting to patch languages!");
+            foreach (var lang in LanguagePatches)
+            {
+                Console.WriteLine(RegexPatch(ref code, lang.Value[0], lang.Value[1])
+                    ? $"Patched {lang.Key}!"
+                    : $"Could not find original VRC+ mention in {lang.Key}! VRCX has changed substantially or the patch was already applied! Please create an Issue if it is the former.");
+            }
+
+            File.WriteAllText(dir, code);
+            Process.Start($@"{basePath}\VRCX.exe");
+            WaitForMsg("Successfully patched VRCX!");
+        }
+
+        private static void WaitForMsg(object reason)
+        {
+            Console.WriteLine(reason);
+            Console.ReadKey();
+        }
+
+        private static bool WaitForChoice(object reason)
+        {
+            Console.WriteLine(reason);
+            var response = Console.ReadKey();
+            Console.WriteLine();
+            return response.KeyChar switch
+            {
+                'Y' => true,
+                'y' => true,
+                _ => false
+            };
+        }
+
+        private static bool RegexPatch(ref string original, string regex, string patch)
+        {
+            var funcReg = new Regex(regex);
+            if (!funcReg.IsMatch(original)) return false;
+            original = funcReg.Replace(original, patch);
+            return true;
+        }
+    }
 }
-
-var vrcx = Process.GetProcessesByName("VRCX");
-
-if (vrcx.Length == 0)
-{
-    Console.WriteLine("please launch VRCX before attempting to patch it!");
-    Console.ReadKey();
-    return;
-}
-
-vrcx[0].Kill();
-
-var dir = Path.GetDirectoryName(vrcx[0].MainModule?.FileName) + "\\html\\app.js";
-
-var method = @"e\.methods\.isLocalUserVrcplusSupporter=function\(\)\{\s*return\s*g\.currentUser\.\$isVRCPlus\s*\}";
-
-var enstr = @"Local Favorites \(Requires VRC\+\)";
-
-var patch = "e.methods.isLocalUserVrcplusSupporter=function(){return true}";
-
-var enpatch = "Local Favorites";
-
-var code = File.ReadAllText(dir);
-
-var methodReg = new Regex(method);
-var enstrReg = new Regex(enstr);
-
-if (methodReg.IsMatch(code) & enstrReg.IsMatch(code))
-{
-    code = methodReg.Replace(code, patch);
-    code = enstrReg.Replace(code, enpatch);
-    
-    File.WriteAllText(dir, code);
-    Console.WriteLine("Successfully patched VRCX!");
-}
-else
-{
-    Console.WriteLine("Unable to patch VRCX!");
-}
-
-Console.ReadKey();
