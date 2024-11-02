@@ -1,6 +1,6 @@
-## Building Overcast
+## Building VRCXPlus
 
-This repository includes a GitHub Actions workflow to build Overcast.
+This repository includes a GitHub Actions workflow to build VRCXPlus.
 
 1. **Fork the Repository**:
    - Click the "Fork" button at the top-right corner of the page to create a copy of the repository in your GitHub account.
@@ -10,7 +10,7 @@ This repository includes a GitHub Actions workflow to build Overcast.
    - Click on the "Actions" tab.
 
 3. **Select the Workflow**:
-   - Find and click on the workflow named `Build Overcast`
+   - Find and click on the workflow named `Build VRCXPlus`
 
 4. **Manually Trigger the Workflow**:
    - Click the "Run workflow" button on the workflow page.
