@@ -1,11 +1,3 @@
-# Disclaimer
-
-This code is provided for educational purposes only. It is provided "as-is" without warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability or fitness for a particular purpose. The author(s) shall not be liable for any damages arising from the use of this code.
-
-# Limitations of Liability
-
-The author(s) of this code are not responsible for any consequences arising from its use. Users should test and review the code thoroughly before deploying it in any production environment.
-
 ## Building Overcast
 
 This repository includes a GitHub Actions workflow to build Overcast.
@@ -26,3 +18,11 @@ This repository includes a GitHub Actions workflow to build Overcast.
 5. **Download the Artifact**:
    - Once the workflow completes successfully, you will find the build artifact in the "Artifacts" section of the workflow run.
    - Click on the artifact to download it.
+
+# Disclaimer
+
+This code is provided for educational purposes only. It is provided "as-is" without warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability or fitness for a particular purpose. The author(s) shall not be liable for any damages arising from the use of this code.
+
+# Limitations of Liability
+
+The author(s) of this code are not responsible for any consequences arising from its use. Users should test and review the code thoroughly before deploying it in any production environment.
