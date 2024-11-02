@@ -150,7 +150,7 @@ namespace VRCXPlus
 
                 Console.WriteLine("Input override base path!");
                 basePath = Console.ReadLine();
-                dir = $"{basePath}\html\app.js";
+                dir = @$"{basePath}\html\app.js";
             }
 
             if (vrcx.Length > 0)
