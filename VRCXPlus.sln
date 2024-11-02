@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Overcast", "Overcast.csproj", "{FCECC314-20AF-4FD2-9ED7-F1450E407D92}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRCXPlus", "VRCXPlus.csproj", "{FCECC314-20AF-4FD2-9ED7-F1450E407D92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
