@@ -173,9 +173,7 @@ namespace VRCXPlus
             {
                 for (int i = 0; i < lang.Value.Length / 2; i++)
                 {
-                    var original = lang.Value[i];
-                    var replacement = lang.Value[i + 1];
-                    Console.WriteLine(RegexPatch(ref code, original, replacement)
+                    Console.WriteLine(RegexPatch(ref code, lang.Value[i], lang.Value[i + 1])
                         ? $"Patched {lang.Key}[{i}]!"
                         : $"Failed to patch {lang.Key}[{i}], this could be due to Stable/Nightly discrepancies!");
                 }
