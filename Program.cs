@@ -1,4 +1,4 @@
-﻿#region Resharper
+#region Resharper
 // ReSharper disable IdentifierTypo
 // ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
@@ -88,16 +88,13 @@ namespace VRCXPlus
                 }
             },
             {
-                "zh-cn p1", new[]
+                "zh-cn", new[]
                 {
-                    @"模型收藏 \(需要VRC\+，游戏中不可见\)",
-                    "模型收藏"
-                }
-            },
-            {
-                "zh-cn p2", new[]
-                {
-                    @"本地收藏\（需要VRC\+，游戏内不可见\）",
+                    @"模型收藏（需要VRC\+，游戏中不可见）", // 6A21, 578B, 6536, 85CF, FF08, 9700, 8981, 0056, 0052, 0043, 002B, FF0C, 6E38, 620F, 4E2D, 4E0D, 53EF, 89C1, FF09
+                    "模型收藏",
+                    @"本地收藏（需要VRC\+，游戏内不可见）", // 672C, 5730, 6536, 85CF, FF08, 9700, 8981, 0056, 0052, 0043, 002B, FF0C, 6E38, 620F, 5185, 4E0D, 53EF, 89C1, FF09
+                    "本地收藏",
+                    @"本地收藏（需要VRC\+，游戏内不可见）", // 672C, 5730, 6536, 85CF, FF08, 9700, 8981, 0056, 0052, 0043, 002B, FF0C, 6E38, 620F, 5185, 4E0D, 53EF, 89C1, FF09
                     "本地收藏"
                 }
             }
@@ -174,9 +171,14 @@ namespace VRCXPlus
             Console.WriteLine("Attempting to patch languages!");
             foreach (var lang in LanguagePatches)
             {
-                Console.WriteLine(RegexPatch(ref code, lang.Value[0], lang.Value[1])
-                    ? $"Patched {lang.Key}!"
-                    : $"Could not find original VRC+ mention in {lang.Key}! VRCX has changed substantially or the patch was already applied! Please create an Issue if it is the former.");
+                for (int i = 0; i < lang.Value.Length / 2; i++)
+                {
+                    var original = lang.Value[i];
+                    var replacement = lang.Value[i + 1];
+                    Console.WriteLine(RegexPatch(ref code, original, replacement)
+                        ? $"Patched {lang.Key}[{i}]!"
+                        : $"Failed to patch {lang.Key}[{i}], this could be due to Stable/Nightly discrepancies!");
+                }
             }
 
             File.WriteAllText(dir, code);
