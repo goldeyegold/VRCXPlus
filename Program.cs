@@ -46,7 +46,7 @@ namespace VRCXPlus
         private static readonly Dictionary<string, string[]> LanguagePatches = new()
         {
             {
-                "en, fr, ko, vi, zh-tw", new[]
+                "en, fr, ko, vi", new[]
                 {
                     @"Local Favorites \(Requires VRC\+\)",
                     "Local Favorites"
@@ -95,6 +95,13 @@ namespace VRCXPlus
                     @"本地收藏（需要VRC\+，游戏内不可见）", // 672C, 5730, 6536, 85CF, FF08, 9700, 8981, 0056, 0052, 0043, 002B, FF0C, 6E38, 620F, 5185, 4E0D, 53EF, 89C1, FF09
                     "本地收藏",
                     @"本地收藏（需要VRC\+，游戏内不可见）", // 672C, 5730, 6536, 85CF, FF08, 9700, 8981, 0056, 0052, 0043, 002B, FF0C, 6E38, 620F, 5185, 4E0D, 53EF, 89C1, FF09
+                    "本地收藏"
+                }
+            },
+            {
+                "zh-tw", new[]
+                {
+                    @"本地收藏 (需要 VRC\+)",
                     "本地收藏"
                 }
             }
