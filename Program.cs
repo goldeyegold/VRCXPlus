@@ -101,7 +101,7 @@ namespace VRCXPlus
             {
                 "zh-tw", new[]
                 {
-                    @"本地收藏列表 (需要 VRC\+)",
+                    @"本地收藏列表 \(需要 VRC\+\)", // These are actual parenthesis' and have to be escaped
                     "本地收藏列表"
                 }
             }
